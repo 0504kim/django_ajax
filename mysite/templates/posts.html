@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>장고 웹 프로젝트</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <main>
+        <h1>キンミヌ</h1>
+        <p>
+            <button type="button" onclick="get_posts(1)">AJAX 버튼1</button>
+        </p>
+        <p>
+            <button type="button" onclick="get_posts(2)">AJAX 버튼2</button>
+        </p>
+        <p>
+            <button type="button" onclick="get_posts(3)">AJAX 버튼3</button>
+        </p>
+        <p>
+            <input type="number" id="postIdInput" placeholder="포스트 번호 입력"/>
+            <button type="button" onclick="get_posts()">Id 입력</button>
+        </p>
+        <p>
+            <button type="button" onclick="get_posts_all()">다가져와</button>
+        </p>
+        <p id="posts">
+            여기가 바뀜
+        <p>
+        <p id="posts_all">
+            전체는 요 아래가 바뀜
+            <table border="1" id="posts_table">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>userId</th>
+                        <th>title</th>
+                    </tr>
+                </thead>
+                <tbody id="posts_table_body">
+                </tbody>
+            </table>
+        </p>
+    </main>
+    <script>
+        // posts 목록 가져오기
+        function get_posts(id) {
+
+            let postId = document.getElementById("postIdInput").value;
+
+            // XMLHttpRequest 객체 생성
+            xhttp = new XMLHttpRequest();
+
+            // XMLHttpRequest를 이용해서 불러온 정보를 처리하는 함수
+            xhttp.onload = function(id) {
+                let status = this.status;
+                let statusText = this.statusText;
+
+                if (this.readyState == 4 && this.status == 200) {
+                    let responseText = this.responseText;
+
+                    let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
+
+                    document.getElementById("posts").innerHTML = responseJSON.title;
+                    
+                } else {
+                    alert('정보를 불러오지 못했습니다.')
+                }
+
+            }
+
+            if (postId) {
+                id = postId
+            }
+            xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/${id}/`);
+            xhttp.send();
+        }
+
+        function get_posts_all() {
+            // XMLHttpRequest 객체 생성
+            xhttp = new XMLHttpRequest();
+
+            // XMLHttpRequest를 이용해서 불러온 정보를 처리하는 함수
+            xhttp.onload = function() {
+                let status = this.status;
+                let statusText = this.statusText;
+
+                if (this.readyState == 4 && this.status == 200) {
+                    let responseText = this.responseText;
+
+                    let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
+                    let tr = '';
+
+                    responseJSON.forEach(function(element) {
+                        console.log(element);
+                        tr += '<tr>';
+                        tr += '<td>' + element.id + '</td>';
+                        tr += '<td>' + element.userId + '</td>';
+                        tr += '<td>' + element.title + '</td>';
+                        tr += '</tr>';
+                    }) 
+                    document.getElementById('posts_table_body').innerHTML = tr;
+                } else {
+                    alert('정보를 불러오지 못했습니다.')
+                }
+
+            }
+
+            xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/`);
+            xhttp.send();
+        }
+    </script>
+  </body>
+</html>
