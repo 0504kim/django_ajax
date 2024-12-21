@@ -112,6 +112,8 @@
                     let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
 
                     document.getElementById("posts").innerHTML = responseJSON.title;
+
+                    document.getElementById("postIdInput").value = ''; // 이 위치가 사실상 마지막에 처리됨 = 다끝나고리셋
                     
                 } else {
                     alert('posts 정보를 불러오지 못했습니다.')
@@ -121,7 +123,6 @@
 
             if (postId) {
                 xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/${postId}/`);
-                document.getElementById("postIdInput").value = '';
             } else {
                 xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/${id}/`);
             }
