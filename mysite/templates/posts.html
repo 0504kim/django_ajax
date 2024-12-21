@@ -12,20 +12,23 @@
     <main>
         <h1>キンミヌ</h1>
         <p>
-            <button type="button" onclick="get_posts(1)">AJAX 버튼1</button>
+            <button type="button" onclick="get_posts(1); get_users(1);">AJAX 버튼1</button>
         </p>
         <p>
-            <button type="button" onclick="get_posts(2)">AJAX 버튼2</button>
+            <button type="button" onclick="get_posts(2); get_users(2);">AJAX 버튼2</button>
         </p>
         <p>
-            <button type="button" onclick="get_posts(3)">AJAX 버튼3</button>
+            <button type="button" onclick="get_posts(3); get_users(3);">AJAX 버튼3</button>
         </p>
         <p>
             <input type="number" id="postIdInput" placeholder="포스트 번호 입력"/>
-            <button type="button" onclick="get_posts()">Id 입력</button>
+            <button type="button" onclick="get_posts(); get_users();">Id 입력</button>
         </p>
         <p>
             <button type="button" onclick="get_posts_all()">다가져와</button>
+        </p>
+        <p id="username">
+            username용
         </p>
         <p id="posts">
             여기가 바뀜
@@ -37,6 +40,7 @@
                     <tr>
                         <th>id</th>
                         <th>userId</th>
+                        <th>username</th>
                         <th>title</th>
                     </tr>
                 </thead>
@@ -46,13 +50,56 @@
         </p>
     </main>
     <script>
+        // 사용자 목록
+        let usersJSON;
+
+        // user 정보 가져오기
+        function get_user(userId) {
+            let user;
+            usersJSON.forEach(function(element) {
+                if (element.id == userId) {
+                    console.log(element);
+                    user = element;
+                }
+            })
+            return user;
+        }
+
+        // users 목록 가져오기
+        function get_users(id) {
+            let userId = document.getElementById("postIdInput").value;
+
+            const xhttp = new XMLHttpRequest();
+            
+            xhttp.onload = function() {
+                let status = this.status;
+
+                if (status == 200) {
+                    let responseText = this.responseText;
+                    usersJSON = JSON.parse(responseText);
+                    if (userId) {
+                        id = userId;
+                    }
+                    let user1 = get_user(id);
+                    console.log(user1);
+                    document.getElementById("username").innerHTML = user1.username;
+                } else {
+                    alert('users 정보를 불러오지 못했습니다.');
+                }
+            }
+
+            xhttp.open("GET", "https://jsonplaceholder.typicode.com/users");
+            xhttp.send();
+
+        }
+
         // posts 목록 가져오기
         function get_posts(id) {
 
             let postId = document.getElementById("postIdInput").value;
 
             // XMLHttpRequest 객체 생성
-            xhttp = new XMLHttpRequest();
+            const xhttp = new XMLHttpRequest();
 
             // XMLHttpRequest를 이용해서 불러온 정보를 처리하는 함수
             xhttp.onload = function(id) {
@@ -67,15 +114,17 @@
                     document.getElementById("posts").innerHTML = responseJSON.title;
                     
                 } else {
-                    alert('정보를 불러오지 못했습니다.')
+                    alert('posts 정보를 불러오지 못했습니다.')
                 }
 
             }
 
             if (postId) {
-                id = postId
+                xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/${postId}/`);
+                document.getElementById("postIdInput").value = '';
+            } else {
+                xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/${id}/`);
             }
-            xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/${id}/`);
             xhttp.send();
         }
 
@@ -96,9 +145,11 @@
 
                     responseJSON.forEach(function(element) {
                         console.log(element);
+                        let user = get_user(element.userId);
                         tr += '<tr>';
                         tr += '<td>' + element.id + '</td>';
                         tr += '<td>' + element.userId + '</td>';
+                        tr += '<td>' + user.username + '</td>';
                         tr += '<td>' + element.title + '</td>';
                         tr += '</tr>';
                     }) 
@@ -112,6 +163,9 @@
             xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/`);
             xhttp.send();
         }
+
+        // users 목록 불러오기
+        get_users();
     </script>
   </body>
 </html>
