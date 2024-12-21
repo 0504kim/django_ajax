@@ -10,7 +10,7 @@
   </head>
   <body>
     <main>
-        <h1>キンミヌ</h1>
+        <h1>POST</h1>
         <p>
             <button type="button" onclick="get_posts(1); get_users(1);">AJAX 버튼1</button>
         </p>
@@ -46,6 +46,31 @@
                 </thead>
                 <tbody id="posts_table_body">
                 </tbody>
+            </table>
+        </p>
+        <p id="post" style="display:none">
+            글 상세보기
+            <table border="1" id="post_table" style="display:none">
+                <tr>
+                    <th>id</th>
+                    <td id="post_table_id"></td>
+                </tr>
+                <tr>
+                    <th>userId</th>
+                    <td id="post_table_userId"></td>
+                </tr>
+                <tr>
+                    <th>username</th>
+                    <td id="post_table_username"></td>
+                </tr>
+                <tr>
+                    <th>title</th>
+                    <td id="post_table_title"></td>
+                </tr>
+                <tr>
+                    <th>body</th>
+                    <td id="post_table_body"></td>
+                </tr>
             </table>
         </p>
     </main>
@@ -91,6 +116,32 @@
             xhttp.open("GET", "https://jsonplaceholder.typicode.com/users");
             xhttp.send();
 
+        }
+
+        // post 정보 가져오기
+        function get_post(id) {
+            const xhttp = new XMLHttpRequest();
+
+            xhttp.onload = function() {
+                let responseText = this.responseText;
+                let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
+                console.log(responseJSON);
+                let user = get_user(responseJSON.userId);
+
+                document.getElementById("post_table_id").innerHTML = responseJSON.id;
+                document.getElementById("post_table_userId").innerHTML = responseJSON.userId;
+                document.getElementById("post_table_username").innerHTML = user.username;
+                document.getElementById("post_table_title").innerHTML = responseJSON.title;
+                document.getElementById("post_table_body").innerHTML = responseJSON.body;
+
+                document.getElementById('posts_all').style.display = 'none';
+                document.getElementById('posts_table').style.display = 'none';
+                document.getElementById('post').style.display = 'block';
+                document.getElementById('post_table').style.display = 'block';
+            }
+
+            xhttp.open("GET", `https://jsonplaceholder.typicode.com/posts/` + id);
+            xhttp.send();
         }
 
         // posts 목록 가져오기
@@ -147,14 +198,21 @@
                     responseJSON.forEach(function(element) {
                         console.log(element);
                         let user = get_user(element.userId);
+
                         tr += '<tr>';
                         tr += '<td>' + element.id + '</td>';
                         tr += '<td>' + element.userId + '</td>';
                         tr += '<td>' + user.username + '</td>';
-                        tr += '<td>' + element.title + '</td>';
+                        tr += '<td><a href="#" onclick="get_post(' + element.id + ')">' + element.title + '</a></td>';
                         tr += '</tr>';
                     }) 
                     document.getElementById('posts_table_body').innerHTML = tr;
+
+                    document.getElementById('posts_all').style.display = 'block';
+                    document.getElementById('posts_table').style.display = 'block';
+                    document.getElementById('post').style.display = 'none';
+                    document.getElementById('post_table').style.display = 'none';
+
                 } else {
                     alert('정보를 불러오지 못했습니다.')
                 }

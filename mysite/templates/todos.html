@@ -12,40 +12,66 @@
     <main>
         <h1>TODO</h1>
         <p>
-            <button type="button" onclick="get_posts(1); get_users(1);">AJAX 버튼1</button>
+            <button type="button" onclick="get_todos(1); get_users(1);">AJAX 버튼1</button>
         </p>
         <p>
-            <button type="button" onclick="get_posts(2); get_users(2);">AJAX 버튼2</button>
+            <button type="button" onclick="get_todos(2); get_users(2);">AJAX 버튼2</button>
         </p>
         <p>
-            <button type="button" onclick="get_posts(3); get_users(3);">AJAX 버튼3</button>
+            <button type="button" onclick="get_todos(3); get_users(3);">AJAX 버튼3</button>
         </p>
         <p>
-            <input type="number" id="postIdInput" placeholder="포스트 번호 입력"/>
-            <button type="button" onclick="get_posts(); get_users();">Id 입력</button>
+            <input type="number" id="todoIdInput" placeholder="포스트 번호 입력"/>
+            <button type="button" onclick="get_todos(); get_users();">Id 입력</button>
         </p>
         <p>
-            <button type="button" onclick="get_posts_all()">다가져와</button>
+            <button type="button" onclick="get_todos_all()">다가져와</button>
         </p>
         <p id="username">
             username용
         </p>
-        <p id="posts">
+        <p id="todos">
             여기가 바뀜
         <p>
-        <p id="posts_all">
+        <p id="todos_all">
             전체는 요 아래가 바뀜
-            <table border="1" id="posts_table">
+            <table border="1" id="todos_table">
                 <thead>
                     <tr>
                         <th>id</th>
                         <th>userId</th>
                         <th>username</th>
+                        <th>completed</th>
                         <th>title</th>
                     </tr>
                 </thead>
-                <tbody id="posts_table_body">
+                <tbody id="todos_table_body">
                 </tbody>
+            </table>
+        </p>
+        <p id="todo" style="display:none">
+            글 상세보기
+            <table border="1" id="todo_table" style="display:none">
+                <tr>
+                    <th>id</th>
+                    <td id="todo_table_id"></td>
+                </tr>
+                <tr>
+                    <th>userId</th>
+                    <td id="todo_table_userId"></td>
+                </tr>
+                <tr>
+                    <th>username</th>
+                    <td id="todo_table_username"></td>
+                </tr>
+                <tr>
+                    <th>title</th>
+                    <td id="todo_table_title"></td>
+                </tr>
+                <tr>
+                    <th>completed</th>
+                    <td id="todo_table_completed"></td>
+                </tr>
             </table>
         </p>
     </main>
@@ -67,7 +93,7 @@
 
         // users 목록 가져오기
         function get_users(id) {
-            let userId = document.getElementById("postIdInput").value;
+            let userId = document.getElementById("todoIdInput").value;
 
             const xhttp = new XMLHttpRequest();
             
@@ -93,10 +119,36 @@
 
         }
 
-        // posts 목록 가져오기
-        function get_posts(id) {
+        // todo 정보 가져오기
+        function get_todo(id) {
+            const xhttp = new XMLHttpRequest();
 
-            let postId = document.getElementById("postIdInput").value;
+            xhttp.onload = function() {
+                let responseText = this.responseText;
+                let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
+                console.log(responseJSON);
+                let user = get_user(responseJSON.userId);
+
+                document.getElementById("todo_table_id").innerHTML = responseJSON.id;
+                document.getElementById("todo_table_userId").innerHTML = responseJSON.userId;
+                document.getElementById("todo_table_username").innerHTML = user.username;
+                document.getElementById("todo_table_title").innerHTML = responseJSON.title;
+                document.getElementById("todo_table_completed").innerHTML = responseJSON.completed ? 'O': 'X';
+
+                document.getElementById('todos_all').style.display = 'none';
+                document.getElementById('todos_table').style.display = 'none';
+                document.getElementById('todo').style.display = 'block';
+                document.getElementById('todo_table').style.display = 'block';
+            }
+
+            xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/` + id);
+            xhttp.send();
+        }
+
+        // todos 목록 가져오기
+        function get_todos(id) {
+
+            let todoId = document.getElementById("todoIdInput").value;
 
             // XMLHttpRequest 객체 생성
             const xhttp = new XMLHttpRequest();
@@ -111,25 +163,25 @@
 
                     let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
 
-                    document.getElementById("posts").innerHTML = responseJSON.title;
+                    document.getElementById("todos").innerHTML = responseJSON.title;
 
-                    document.getElementById("postIdInput").value = ''; // 이 위치가 사실상 마지막에 처리됨 = 다끝나고리셋
+                    document.getElementById("todoIdInput").value = ''; // 이 위치가 사실상 마지막에 처리됨 = 다끝나고리셋
                     
                 } else {
-                    alert('posts 정보를 불러오지 못했습니다.')
+                    alert('todos 정보를 불러오지 못했습니다.')
                 }
 
             }
 
-            if (postId) {
-                xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/${postId}/`);
+            if (todoId) {
+                xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/${todoId}/`);
             } else {
                 xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/${id}/`);
             }
             xhttp.send();
         }
 
-        function get_posts_all() {
+        function get_todos_all() {
             // XMLHttpRequest 객체 생성
             xhttp = new XMLHttpRequest();
 
@@ -147,14 +199,22 @@
                     responseJSON.forEach(function(element) {
                         console.log(element);
                         let user = get_user(element.userId);
+
                         tr += '<tr>';
                         tr += '<td>' + element.id + '</td>';
                         tr += '<td>' + element.userId + '</td>';
                         tr += '<td>' + user.username + '</td>';
-                        tr += '<td>' + element.title + '</td>';
+                        tr += `<td>${element.completed ? 'O' : 'X'}</td>`;
+                        tr += '<td><a href="#" onclick="get_todo(' + element.id + ')">' + element.title + '</a></td>';
                         tr += '</tr>';
                     }) 
-                    document.getElementById('posts_table_body').innerHTML = tr;
+                    document.getElementById('todos_table_body').innerHTML = tr;
+
+                    document.getElementById('todos_all').style.display = 'block';
+                    document.getElementById('todos_table').style.display = 'block';
+                    document.getElementById('todo').style.display = 'none';
+                    document.getElementById('todo_table').style.display = 'none';
+
                 } else {
                     alert('정보를 불러오지 못했습니다.')
                 }
