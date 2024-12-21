@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>장고 웹 프로젝트</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <main>
+        <h1>TODO</h1>
+        <p>
+            <button type="button" onclick="get_posts(1); get_users(1);">AJAX 버튼1</button>
+        </p>
+        <p>
+            <button type="button" onclick="get_posts(2); get_users(2);">AJAX 버튼2</button>
+        </p>
+        <p>
+            <button type="button" onclick="get_posts(3); get_users(3);">AJAX 버튼3</button>
+        </p>
+        <p>
+            <input type="number" id="postIdInput" placeholder="포스트 번호 입력"/>
+            <button type="button" onclick="get_posts(); get_users();">Id 입력</button>
+        </p>
+        <p>
+            <button type="button" onclick="get_posts_all()">다가져와</button>
+        </p>
+        <p id="username">
+            username용
+        </p>
+        <p id="posts">
+            여기가 바뀜
+        <p>
+        <p id="posts_all">
+            전체는 요 아래가 바뀜
+            <table border="1" id="posts_table">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>userId</th>
+                        <th>username</th>
+                        <th>title</th>
+                    </tr>
+                </thead>
+                <tbody id="posts_table_body">
+                </tbody>
+            </table>
+        </p>
+    </main>
+    <script>
+        // 사용자 목록
+        let usersJSON;
+
+        // user 정보 가져오기
+        function get_user(userId) {
+            let user;
+            usersJSON.forEach(function(element) {
+                if (element.id == userId) {
+                    console.log(element);
+                    user = element;
+                }
+            })
+            return user;
+        }
+
+        // users 목록 가져오기
+        function get_users(id) {
+            let userId = document.getElementById("postIdInput").value;
+
+            const xhttp = new XMLHttpRequest();
+            
+            xhttp.onload = function() {
+                let status = this.status;
+
+                if (status == 200) {
+                    let responseText = this.responseText;
+                    usersJSON = JSON.parse(responseText);
+                    if (userId) {
+                        id = userId;
+                    }
+                    let user1 = get_user(id);
+                    console.log(user1);
+                    document.getElementById("username").innerHTML = user1.username;
+                } else {
+                    alert('users 정보를 불러오지 못했습니다.');
+                }
+            }
+
+            xhttp.open("GET", "https://jsonplaceholder.typicode.com/users");
+            xhttp.send();
+
+        }
+
+        // posts 목록 가져오기
+        function get_posts(id) {
+
+            let postId = document.getElementById("postIdInput").value;
+
+            // XMLHttpRequest 객체 생성
+            const xhttp = new XMLHttpRequest();
+
+            // XMLHttpRequest를 이용해서 불러온 정보를 처리하는 함수
+            xhttp.onload = function(id) {
+                let status = this.status;
+                let statusText = this.statusText;
+
+                if (this.readyState == 4 && this.status == 200) {
+                    let responseText = this.responseText;
+
+                    let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
+
+                    document.getElementById("posts").innerHTML = responseJSON.title;
+
+                    document.getElementById("postIdInput").value = ''; // 이 위치가 사실상 마지막에 처리됨 = 다끝나고리셋
+                    
+                } else {
+                    alert('posts 정보를 불러오지 못했습니다.')
+                }
+
+            }
+
+            if (postId) {
+                xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/${postId}/`);
+            } else {
+                xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/${id}/`);
+            }
+            xhttp.send();
+        }
+
+        function get_posts_all() {
+            // XMLHttpRequest 객체 생성
+            xhttp = new XMLHttpRequest();
+
+            // XMLHttpRequest를 이용해서 불러온 정보를 처리하는 함수
+            xhttp.onload = function() {
+                let status = this.status;
+                let statusText = this.statusText;
+
+                if (this.readyState == 4 && this.status == 200) {
+                    let responseText = this.responseText;
+
+                    let responseJSON = JSON.parse(responseText); // Stirng -> JSON 파싱
+                    let tr = '';
+
+                    responseJSON.forEach(function(element) {
+                        console.log(element);
+                        let user = get_user(element.userId);
+                        tr += '<tr>';
+                        tr += '<td>' + element.id + '</td>';
+                        tr += '<td>' + element.userId + '</td>';
+                        tr += '<td>' + user.username + '</td>';
+                        tr += '<td>' + element.title + '</td>';
+                        tr += '</tr>';
+                    }) 
+                    document.getElementById('posts_table_body').innerHTML = tr;
+                } else {
+                    alert('정보를 불러오지 못했습니다.')
+                }
+
+            }
+
+            xhttp.open("GET", `https://jsonplaceholder.typicode.com/todos/`);
+            xhttp.send();
+        }
+
+        // users 목록 불러오기
+        get_users();
+    </script>
+  </body>
+</html>
