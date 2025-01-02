@@ -66,7 +66,7 @@
                         </tr>
                         <tr>
                             <th scope="row">Username</th>
-                            <td id="postTablUsername"></td>
+                            <td id="postTableUsername"></td>
                         </tr>
                         <tr>
                             <th scope="row">Title</th>
@@ -129,7 +129,19 @@
                 url: "https://jsonplaceholder.typicode.com/posts/" + id,
                 success: function(res) {
                     console.log(res);
-                    //usersJSON = res;
+
+                    let user = get_user(res.userId);
+
+                    $('#postTableId').text(res.id);
+                    $('#postTableUserId').text(res.userId);
+                    $('#postTableUsername').text(user.username);
+                    $('#postTableTitle').html('<strong>' + res.title + '</strong>');
+                    $('#postTableBody').text(res.body);
+
+                    $('#posts').css('display', 'none');
+                    $('#postsTable').css('display', 'none');
+                    $('#post').css('display', 'block');
+                    $('#postTable').css('display', 'block');
                 },
                 error: function(res) {
                     console.log(res);
