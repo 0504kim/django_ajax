@@ -149,7 +149,7 @@
                         tr += '<td>' + element.id + '</td>';
                         tr += '<td>' + element.userId + '</td>';
                         tr += '<td>' + user.username + '</td>';
-                        tr += '<td>' + element.title + '</td>';
+                        tr += '<td><a href="#" class="post-title" data-id="' + element.id + '">' + element.title + '</a></td>';
                         tr += '</tr>';
                     });
                     $('#postsTableBody').html(tr); // #'postsTableBody' 로 하면 안됨
@@ -158,6 +158,11 @@
                     console.log(res);
                 },
             });
+        });
+
+        $(document).on('click', '.post-title', function() {
+            let id = $(this).data('id');
+            console.log(id);
         });
     </script>
   </body>
