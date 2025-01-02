@@ -1,12 +1,19 @@
 from urllib import request
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from .models import Post
+from posts.models import Post
 
 # 목록
 def get_posts(request):
     posts = Post.objects.all()
-    return JsonResponse(posts, safe=False)
+    posts_list = []
+    for post in posts:
+        posts_list.append({
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+        })
+    return JsonResponse(posts_list, safe=False)
 
 # 상세
 def get_post(request, post_id):
