@@ -124,17 +124,21 @@
 
         // post 정보 가져오기
         function get_post(id) {
+            $.ajax({
+                type: "GET",
+                url: "https://jsonplaceholder.typicode.com/posts/" + id,
+                success: function(res) {
+                    console.log(res);
+                    //usersJSON = res;
+                },
+                error: function(res) {
+                    console.log(res);
+                },
+            });
         }
 
         // posts 목록 가져오기
         function get_posts() {
-        }
-
-        // users 목록 불러오기
-        get_users(); 
-
-        // posts 목록 불러오기 버튼 클릭시 (나중에 추가된 object에도 적용됨)
-        $(document).on('click', '#getPostsButton', function() {
             $.ajax({
                 type: "GET",
                 url: "https://jsonplaceholder.typicode.com/posts",
@@ -158,11 +162,20 @@
                     console.log(res);
                 },
             });
+        }
+
+        // users 목록 불러오기
+        get_users(); 
+
+        // posts 목록 불러오기 버튼 클릭시 (나중에 추가된 object에도 적용됨)
+        $(document).on('click', '#getPostsButton', function() {
+            get_posts();
         });
 
         $(document).on('click', '.post-title', function() {
             let id = $(this).data('id');
-            console.log(id);
+            // console.log(id);
+            get_post(id);
         });
     </script>
   </body>
