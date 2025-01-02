@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>장고 웹 프로젝트</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  </head>
+  <body>
+    <main class="container mt-5">
+        <h1 class="text-center mb-4">POST jQuery</h1>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="d-grid gap-2 mb-3">
+                    <button type="button" class="btn btn-primary" onclick="get_posts(1); get_users(1);">AJAX 버튼1</button>
+                    <button type="button" class="btn btn-secondary" onclick="get_posts(2); get_users(2);">AJAX 버튼2</button>
+                    <button type="button" class="btn btn-success" onclick="get_posts(3); get_users(3);">AJAX 버튼3</button>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="postIdInput" placeholder="포스트 번호 입력" />
+                        <button type="button" class="btn btn-outline-primary" onclick="get_posts(); get_users();">Id 입력</button>
+                    </div>
+                    <button type="button" id="getPostsButton">posts 목록 가져오기</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">유저네임</h5>
+                    <p class="card-text" id="username">username용</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">타이틀</h5>
+                    <p id="posts">여기가 바뀜<p>
+                </div>
+            </div>
+            <p id="posts_all">
+                전체는 요 아래가 바뀜
+                <table border="1" id="postsTable">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>userId</th>
+                            <th>username</th>
+                            <th>title</th>
+                        </tr>
+                    </thead>
+                    <tbody id="postsTableBody">
+                    </tbody>
+                </table>
+            </p>
+            <p id="post" style="display:none">
+                <h3>글 상세보기</h3>
+                <table class="table table-striped table-bordered table-hover" id="postTable">
+                    <tbody>
+                        <tr>
+                            <th scope="row">ID</th>
+                            <td id="postTableId"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">User ID</th>
+                            <td id="postTableUserId"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Username</th>
+                            <td id="postTablUsername"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Title</th>
+                            <td id="postTableTitle"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Body</th>
+                            <td id="postTableBody"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        // 사용자 목록 담을 곳
+        let usersJSON;
+
+        // user 정보 가져오기
+        function get_user(userId) {
+            let user;
+            usersJSON.forEach(function(element) {
+                if (element.id == userId) {
+                    console.log(element);
+                    user = element;
+                }
+            });
+            return user;
+        }
+
+        // users 목록 가져오기
+        function get_users() {
+            // jQuery는 parsing할 필요 없이 애초에 내가 원하는 JSON형태로 파싱해서 받음
+            $.ajax({
+                type: "GET",
+                url: "https://jsonplaceholder.typicode.com/users",
+                // dataType: "json", // 내가 넘길 데이터의 형태(규약에 의거함)
+                /* data: {
+                    userId: "abc",
+                }, */
+                success: function(res) {
+                    //console.log(res);
+                    usersJSON = res;
+                },
+                error: function(res) {
+                    console.log(res);
+                },
+            });
+              /*}).done(function(res) { // 자동으로 실행하는 콜백 함수. done은 자동으로 넘겨받은 걸 콜백함수의 첫번째 인자로 실행함
+                console.log(res);
+              });*/
+        }
+
+        // post 정보 가져오기
+        function get_post(id) {
+        }
+
+        // posts 목록 가져오기
+        function get_posts() {
+        }
+
+        // users 목록 불러오기
+        get_users(); 
+
+        // posts 목록 불러오기 버튼 클릭시 (나중에 추가된 object에도 적용됨)
+        $(document).on('click', '#getPostsButton', function() {
+            $.ajax({
+                type: "GET",
+                url: "https://jsonplaceholder.typicode.com/posts",
+
+                success: function(res) {
+                    console.log(res);
+                    let tr = '';
+                    res.forEach(function(element) {
+                        let user = get_user(element.userId);
+    
+                        tr += '<tr>';
+                        tr += '<td>' + element.id + '</td>';
+                        tr += '<td>' + element.userId + '</td>';
+                        tr += '<td>' + user.username + '</td>';
+                        tr += '<td>' + element.title + '</td>';
+                        tr += '</tr>';
+                    });
+                    $('#postsTableBody').html(tr); // #'postsTableBody' 로 하면 안됨
+                },
+                error: function(res) {
+                    console.log(res);
+                },
+            });
+        });
+    </script>
+  </body>
+</html>

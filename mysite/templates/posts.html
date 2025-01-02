@@ -121,8 +121,8 @@
                 }
             }
 
-            xhttp.open("GET", "https://jsonplaceholder.typicode.com/users");
-            xhttp.send();
+            xhttp.open("GET", "https://jsonplaceholder.typicode.com/users"); // 1번 작동
+            xhttp.send(); // 2번 작동 -> 이후 .onload 호출
 
         }
 
